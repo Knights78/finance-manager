@@ -1,0 +1,93 @@
+{{!-- <html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+</head>
+<body>
+  <h1>Login</h1>
+  <form action="/login" method="post">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+    <br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <br>
+    <button type="submit">Login</button>
+  </form>
+  {{#if error}}
+    <p style="color: red;">{{error}}</p>
+  {{/if}}
+</body>
+</html> --}}
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>myloginform</title>
+  <link rel="stylesheet" href="../public/login.css" class="css">
+  {{!-- <link rel="stylesheet" href="form.css"> --}}
+  
+</head>
+
+<body>
+ 
+  <div class="container">
+      <div class="formbox">
+        <h1 id="title">sign In</h1>
+        <form action="/login" method="post">
+          <div class="inputgrp">
+            <div class="inputfield" id="namefield">
+              <i class="fa-regular fa-user"></i>
+              <input type="text" placeholder="enter your name" name="username">
+            </div>
+
+            <div class="inputfield">
+              <i class="fa-solid fa-lock"></i>
+              <input type="password" placeholder="enter your password" name="password">
+            </div>
+
+          </div>
+          <div class="btnfield">
+                <button type="button"class="btn1" id="signupbtn">Sign up</button>
+                <button type="button"class="btn2" id="signinbtn">sign in</button>
+          </div>
+         
+          <div id="errorfield"class="fade-out">{{error}}</div>
+          <button type="submit" class="submitbtn">submit</button>
+
+        </form>
+
+      </div>
+  </div>
+  <script src="https://kit.fontawesome.com/529bc31be0.js" crossorigin="anonymous"></script>
+  <script>
+    document.getElementById('signupbtn').addEventListener('click', function() {
+    window.location.href = '/register'; // Assuming '/login' is the route for the login page
+    
+  });
+
+     const errorfield = document.getElementById('errorfield');
+    
+    if (errorfield.innerHTML.trim() !== '') {
+  // Add the 'fade-out' class to trigger the transition
+  errorfield.classList.add('fade-out');
+
+  // Set a timeout to remove the error message and the 'fade-out' class after the transition
+  setTimeout(() => {
+    errorfield.innerHTML = '';
+    errorfield.classList.remove('fade-out');
+  }, 3000); // Adjust the timeout value to match the transition duration
+}
+
+  </script>  
+   
+
+</body>
+
+</html>
+

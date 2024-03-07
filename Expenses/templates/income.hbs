@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Image Web Page</title>
+    <link rel="stylesheet" type="text/css" href="../public/income.css">
+</head>
+<body>
+    <div id="container">
+        <nav>
+            <div id="profile">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWkSWLRxX42sG_oDs7OlqF2x2Vs88aEBqyWA&usqp=CAU" alt="">
+                <p>{{user.username}}</p>
+            </div>
+            <ul>
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="#">View Transaction</a></li>
+                <li><a href="/income"> Incomes</a></li>
+                <li><a href="/expenses">Expenses</a></li>
+                <div id="logoutbtn"><button id="logout">Log out</button></div>
+            </ul>
+        </nav>
+        <div id="content">
+            <h2 id="heading">INCOMES</h2>
+            <div id="TotalIncomes"> TOTAL INCOMES :{{totalIncome}}</div>
+
+            <div  id="inputfield">
+
+               <div id="forms">
+                 <form action="/income" method="post">
+                    <label for="title">Title:</label>
+                    <input class="field"type="text" id="title" name="title" >
+
+                    <label for="date">Date:</label>
+                    <input class="field" type="date" id="date" name="date" >
+
+                    <label for="amount">Amount:</label>
+                    <input class="field" type="number" id="amount" name="amount" >
+
+                    <button type="submit">ADD INCOME(+)</button>
+                </form>
+               </div>     
+
+            </div>
+            <div id="data">
+                        {{#each existingIncome}}
+                                <div class="income-entry">
+                                <img src="https://your-image-url.com" alt="{{title}}">
+                                <p>Title: {{title}}</p>
+                                <p>Amount: {{amount}}</p>
+                                <p>Date: {{date}}</p>
+                                <button  class="delete-btn" id="deletebtn" data-income-id="{{_id}}">X</button>
+                                </div>
+                        {{/each}}
+                        {{#each AllIncome}}
+                            <div class="income-entry">
+                            <img src="https://your-image-url.com" alt="{{title}}">
+                            <p id="title"> Title: {{title}}</p>
+                            <p id="amount">  Amount: {{amount}}</p>
+                            <p id="date">Date: {{date}}</p>
+                            <button  class="delete-btn" id="deletebtn" data-income-id="{{_id}}">X</button>
+
+                            </div>
+                     {{/each}}
+            </div>
+        </div>
+    </div>
+    <script>
+       document.addEventListener('DOMContentLoaded', () => {
+            const deleteButtons=document.querySelectorAll('.delete-btn')
+            deleteButtons.forEach((button)=>{
+                button.addEventListener('click',async()=>{
+                    //get the attribute
+                   const incomeId= button.getAttribute('data-income-id')
+                    try {
+                // Make an asynchronous request to delete the income entry
+                        const response = await fetch(`/income/${incomeId}`, {method:'DELETE'});
+                        if (response.ok) {
+                               // Update the total income in the UI
+                               button.closest('.income-entry').remove();
+                              updateTotalIncome(data.totalIncome);
+
+                            // Remove the income entry from the UI
+                            
+  }
+                        else {
+                            console.error('Failed to delete income entry');
+                        }
+                    } 
+                    catch (error) {
+                        console.error('Error deleting income entry:', error);
+                        }
+
+                })
+            })
+       })
+       function updateTotalIncome(totalIncome) {
+    // Update the total income in the UI
+        const totalIncomeElement = document.getElementById('TotalIncomes');
+        if (totalIncomeElement) {
+        totalIncomeElement.innerHTML = `TOTAL INCOMES: ${totalIncome}`;
+        }
+  }
+    </script>
+</body>
+</html>

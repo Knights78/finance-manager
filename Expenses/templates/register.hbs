@@ -1,0 +1,88 @@
+{{!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration</title>
+</head>
+<body>
+  <h1>Registration</h1>
+  <form action="/register" method="post">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+    <br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <br>
+    <button type="submit">Register</button>
+  </form>
+  {{#if error}}
+    <p style="color: red;">{{error}}</p>
+  {{/if}}
+</body>
+</html> --}}
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>myloginform</title>
+  <link rel="stylesheet" href="../public/register.css" class="css">
+  {{!-- <link rel="stylesheet" href="form.css"> --}}
+  <style>
+   
+
+
+
+  </style>
+</head>
+
+<body>
+ 
+  <div class="container">
+      <div class="formbox">
+        <h1 id="title">sign up</h1>
+        <form action="/register" method="post">
+          <div class="inputgrp">
+            <div class="inputfield" id="namefield">
+              <i class="fa-regular fa-user"></i>
+              <input type="text" placeholder="enter your name" name="username">
+            </div>
+
+            <div class="inputfield">
+              <i class="fa-solid fa-lock"></i>
+              <input type="password" placeholder="enter your password" name="password">
+            </div>
+
+          </div>
+          <div class="btnfield">
+                <button type="button"class="btn1" id="signupbtn">Sign up</button>
+                <button type="button"class="btn2" id="signinbtn">sign in</button>
+          </div>
+         
+          <button type="submit" class="submitbtn">submit</button>
+
+        </form>
+
+      </div>
+  </div>
+  <script src="https://kit.fontawesome.com/529bc31be0.js" crossorigin="anonymous"></script>
+  <script>
+    document.getElementById('signinbtn').addEventListener('click', function() {
+    window.location.href = '/login'; // Assuming '/login' is the route for the login page
+  });
+
+    
+
+  </script>  
+   
+
+</body>
+
+</html>
+
+
+
