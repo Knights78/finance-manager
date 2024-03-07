@@ -164,7 +164,7 @@ app.delete('/income/:id',async(req,res)=>{
     const existingIncome = await Income.find({ user: user._id });
     const totalIncome = existingIncome.reduce((sum, income) => sum + income.amount, 0);
     //console.log(totalIncome)
-    res.status(204).send();
+    res.status(204).send({totalIncome});
     
   } 
   catch (error) {
