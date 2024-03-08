@@ -76,8 +76,10 @@
                         const response = await fetch(`/income/${incomeId}`, {method:'DELETE'});
                         if (response.ok) {
                                // Update the total income in the UI
-                               button.closest('.income-entry').remove();
-                              updateTotalIncome(data.totalIncome);
+                                button.closest('.income-entry').remove();
+                                const data = await response.json();
+                                updateTotalIncome(data.totalIncome);
+                               
 
                             // Remove the income entry from the UI
                             
@@ -97,6 +99,7 @@
     // Update the total income in the UI
         const totalIncomeElement = document.getElementById('TotalIncomes');
         if (totalIncomeElement) {
+            console.log(totalIncome)
         totalIncomeElement.textContent = `TOTAL INCOMES: ${totalIncome}`;
         }
   }

@@ -9,7 +9,7 @@ const { User, Income, Expense } = require('./models/User');
 const path=require("path")
 const templatepath=path.join(__dirname,'../templates')
 const app = express();
-const port = 3000;
+const port = 3001;
 
 
 // Connect to MongoDB
@@ -115,7 +115,7 @@ app.get('/income', async (req, res) => {
 
 
   const existingIncome = await Income.find({ user: user._id });
-  console.log(existingIncome)
+  //console.log(existingIncome)
   const totalIncome = existingIncome.reduce((sum, income) => sum + income.amount, 0);//this reduce is a method which is used in an iterable object here from the income sum is the variable initially it is zero and for new user the sum will be zero untile and unless it adds the income
   //console.log(totalIncome)
   // Render the template with existing income data
@@ -127,7 +127,7 @@ app.post('/income', async (req, res) => {
 
   // Extract data from the form submission
   let { title, date, amount } = req.body;
-  console.log(title,date,amount)
+  //console.log(title,date,amount)
   
 
   try {
@@ -142,7 +142,7 @@ app.post('/income', async (req, res) => {
 
       const savedIncome = await newIncome.save();
 
-      console.log('Income saved successfully:', savedIncome);
+      //console.log('Income saved successfully:', savedIncome);
       const AllIncome=await Income.find({ user: user._id });
       const totalIncome = AllIncome.reduce((sum, income) => sum + income.amount, 0);//it is taking the income from 
 
@@ -156,26 +156,62 @@ app.post('/income', async (req, res) => {
       res.render('income.hbs', { user, error: 'Error saving income' });
   }
 });
-app.delete('/income/:id',async(req,res)=>{
-  const user=req.session.user;
-  const incomeId=req.params.id
-  try {
-    await Income.deleteOne({ _id: incomeId, user: user._id });
-    const existingIncome = await Income.find({ user: user._id });
-    const totalIncome = existingIncome.reduce((sum, income) => sum + income.amount, 0);
-    //console.log(totalIncome)
-    res.status(204).send({totalIncome});
-    
-  } 
-  catch (error) {
-    console.error('Error deleting income entry:', error);
-    res.status(500).json({ error: 'Error deleting income entry' }); 
 
+app.delete('/income/:id', async (req, res) => {
+  const user = req.session.user;
+  const incomeId = req.params.id;
+
+  try {
+      await Income.deleteOne({ _id: incomeId, user: user._id });
+      const existingIncome = await Income.find({ user: user._id });
+      const totalIncome = existingIncome.reduce((sum, income) => sum + income.amount, 0);
+
+      // Send a JSON response with the updated totalIncome
+      res.status(204).json({});
+  } catch (error) {
+      console.error('Error deleting income entry:', error);
+      res.status(500).json({ error: 'Error deleting income entry' });
+  }
+});
+
+
+//expesnes section
+app.get('/expenses', async (req, res) => {
+  // Assuming the user is already stored in the session
+  let user = req.session.user;
+
+  // Make sure income is always present and defaults to 0
+  if (!user || user.income === undefined) {
+    user = { expense: 0, ...user };
   }
 
+
+  const existingExpense = await Expense.find({ user: user._id });
+  //console.log(existingIncome)
+  const totalExpense = existingExpense.reduce((sum, income) => sum + income.amount, 0);//this reduce is a method which is used in an iterable object here from the income sum is the variable initially it is zero and for new user the sum will be zero untile and unless it adds the income
+  //console.log(totalIncome)
+  // Render the template with existing income data
+  res.render('expenses.hbs', { user,existingExpense,totalExpense });
+});
+
+app.post('/expenses',async (req,res)=>{
+  let user=req.session.user
+  let{title,date,amount}=req.body
+  const newExpense=new Expense({user: user._id,title,date,amount})
+  try{
+  const savedExpense=await newExpense.save()
+  const AllExpense=await Expense.find({ user: user._id });
+  const totalExpense = AllExpense.reduce((sum, income) => sum + income.amount, 0);
+  }
+  catch(error){
+    console.error(error);
+      res.render('expenses.hbs', { user, error: 'Error saving income' });
+  }
 })
 
-
+app.delete('/expense/:id',async(req,res)=>{
+  
+})
 
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
