@@ -98,11 +98,7 @@ app.get('/dashboard', (req, res) => {
 });
 
 
-app.get('/transactions', (req, res) => {
-  const user = req.session.user;
-  res.render('transactions.hbs',{user});
 
-});
 
 app.get('/income', async (req, res) => {
   // Assuming the user is already stored in the session
@@ -181,14 +177,14 @@ app.get('/expenses', async (req, res) => {
   let user = req.session.user;
 
   // Make sure income is always present and defaults to 0
-  if (!user || user.income === undefined) {
+  if (!user || user.expense === undefined) {
     user = { expense: 0, ...user };
   }
 
 
   const existingExpense = await Expense.find({ user: user._id });
   //console.log(existingIncome)
-  const totalExpense = existingExpense.reduce((sum, income) => sum + income.amount, 0);//this reduce is a method which is used in an iterable object here from the income sum is the variable initially it is zero and for new user the sum will be zero untile and unless it adds the income
+  const totalExpense = existingExpense.reduce((sum, expense) => sum + expense.amount, 0);//this reduce is a method which is used in an iterable object here from the income sum is the variable initially it is zero and for new user the sum will be zero untile and unless it adds the income
   //console.log(totalIncome)
   // Render the template with existing income data
   res.render('expenses.hbs', { user,existingExpense,totalExpense });
@@ -200,19 +196,53 @@ app.post('/expenses',async (req,res)=>{
   const newExpense=new Expense({user: user._id,title,date,amount})
   try{
   const savedExpense=await newExpense.save()
+  
+  console.log('expesne saved successfully:', savedExpense);
   const AllExpense=await Expense.find({ user: user._id });
-  const totalExpense = AllExpense.reduce((sum, income) => sum + income.amount, 0);
+  const totalExpense = AllExpense.reduce((sum, expense) => sum + expense.amount, 0);
+  res.render('expenses.hbs',{AllExpense,totalExpense})
   }
   catch(error){
     console.error(error);
       res.render('expenses.hbs', { user, error: 'Error saving income' });
   }
+ 
 })
 
 app.delete('/expense/:id',async(req,res)=>{
-  
-})
+  const user = req.session.user;
+  const expenseId = req.params.id;
 
+  try {
+      await Expense.deleteOne({ _id: expenseId, user: user._id });
+      const existingExpense = await Expense.find({ user: user._id });
+      const totalExpense = existingExpense.reduce((sum, expense) => sum + expense.amount, 0);
+
+      // Send a JSON response with the updated totalIncome
+      res.status(204).json({});
+  } catch (error) {
+      console.error('Error deleting expense entry:', error);
+      res.status(500).json({ error: 'Error deleting expense entry' });
+  }
+})
+//transactions section....///./...././
+app.get('/transactions',async (req,res)=>{
+    let user=req.session.user;
+    
+  const existingIncome = await Income.find({ user: user._id });//all the dat for that particular id is there in exixiting income 
+  
+  const totalIncome = existingIncome.reduce((sum, income) => sum + income.amount, 0);//total income is actually the sum of all amounts in that particular id 
+  
+  
+  const existingExpense = await Expense.find({ user: user._id });
+  //console.log(existingIncome)
+  const totalExpense = existingExpense.reduce((sum, expense) => sum + expense.amount, 0);//expense: The current element in the array being processed.
+  const totalBalance=totalIncome-totalExpense
+  
+
+  res.render('transactions.hbs',{totalIncome,totalExpense,totalBalance})
+
+})
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
     // res.redirect('/login');

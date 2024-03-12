@@ -1,26 +1,54 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Image Web Page</title>
-    <link rel="stylesheet" type="text/css" href="../public/transactions.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance management</title>
+    <link rel="stylesheet" href="../public/transactions.css">
 </head>
 <body>
-    <div id="container">
-        <nav>
-            <div id="profile">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWkSWLRxX42sG_oDs7OlqF2x2Vs88aEBqyWA&usqp=CAU" alt="">
-                <p>{{user.username}}</p>
+    <div class="container">
+        <nav class="navbar">
+            <div class="profile">
+                <!-- <img src="" alt="proflie photo"> -->
+                <h3>{{user.username}}</h3>
             </div>
             <ul>
                 <li><a href="/dashboard">Dashboard</a></li>
-                <li><a href="#">View Transaction</a></li>
+                <li>All Transactions</li>
                 <li><a href="/income">Incomes</a></li>
-                <li><a href="/expenses">Expenses</a></li>
-                <div id="logoutbtn"><button id="logout">Log out</button></div>
-            </ul>
+                <li><a href="/expense">Expenses</a></li>
+                <li>View Transactions</li>
+              </ul>
+              <button id="signout">Sign Out</button>
         </nav>
-        <div id="content">
+        <div class="content">
+            <div class="header">
+                <h1>All transactions</h1>
+            </div>
+            <div class="graph">
+                <h2>Graph</h2>
+                <!-- Add graph or table here -->
+            </div>
+            <div class="summary">
+                <div class="summary-item">
+                    <h2>Total Income</h2>  
+                    <h2>{{totalIncome}}</h2>                  
+                </div>
+                <div class="summary-item">
+                    <h2>Total Expenses</h2>
+                    <h2>{{totalExpense}}</h2>
+                </div>
+                <div class="summary-item">
+                    <h2>Total Balance</h2>
+                    <h2>{{totalBalance}}</h2>
+                </div>
+            </div>
             
+            <div class="transactions">
+                <h2>Recent Transactions</h2>
+                <!-- Add transactions list here -->
+            </div>
         </div>
     </div>
 </body>
