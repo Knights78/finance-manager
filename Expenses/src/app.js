@@ -227,8 +227,9 @@ app.delete('/expense/:id',async(req,res)=>{
 })
 //transactions section....///./...././
 app.get('/transactions',async (req,res)=>{
-    let user=req.session.user;
-    
+ 
+  try{  
+    let user=req.session.user;  
   const existingIncome = await Income.find({ user: user._id });//all the dat for that particular id is there in exixiting income 
   
   const totalIncome = existingIncome.reduce((sum, income) => sum + income.amount, 0);//total income is actually the sum of all amounts in that particular id 
@@ -238,9 +239,40 @@ app.get('/transactions',async (req,res)=>{
   //console.log(existingIncome)
   const totalExpense = existingExpense.reduce((sum, expense) => sum + expense.amount, 0);//expense: The current element in the array being processed.
   const totalBalance=totalIncome-totalExpense
+
+  const currentDate = new Date();//this will give us the current date 
+  const sevenDaysAgo = new Date(currentDate);//this is taking the current date means initially sevendaysago and currentdate is same 
+  sevenDaysAgo.setDate(currentDate.getDate() - 6);//in this setdate method is used to setdate of sevendays ago currentdate.getdate will give us the date which is present in currentdate variable
+  console.log("User ID:", user._id);
+console.log("Date Range:", sevenDaysAgo, "to", currentDate);
+  const incomeRecords=await Income.find({user:user._id,date:{$gte:sevenDaysAgo,$lte:currentDate}});//in this we will get all the income which is satisfying the condition of date greater than sevendys and less than the current date
+  const incomeData=incomeRecords.map(record=>record.amount)//we are applying map for each record in that income collection and we are taking the amount menas at each index we are getting the income as an array 
+
+  //similarly for expenses as well 
+  const expenseRecords=await Expense.find({user:user._id,date:{$gte:sevenDaysAgo,$lte:currentDate}});//in this we will get all the income which is satisfying the condition of date greater than sevendys and less than the current date
+  //console.log(expenseRecords)
+  const expenseData=expenseRecords.map(record=>record.amount)
+  //console.log(expenseData)
+  //console.log(incomeData)
   
 
-  res.render('transactions.hbs',{totalIncome,totalExpense,totalBalance})
+  res.render('transactions.hbs', {
+    user,
+    incomeData:JSON.stringify(incomeData),
+    totalIncome,
+    totalExpense,
+    totalBalance,
+    expenseData:JSON.stringify(expenseData)
+  });
+
+  }
+  catch(error){
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+  
+
+  
 
 })
 app.get('/logout', (req, res) => {
