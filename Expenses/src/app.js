@@ -255,6 +255,18 @@ console.log("Date Range:", sevenDaysAgo, "to", currentDate);
   //console.log(expenseData)
   //console.log(incomeData)
   
+  const mostRecentIncome = await Income.findOne({ user: user._id }).sort({ date: -1 }).select('title amount');
+
+  const mostRecentExpense = await Expense.findOne({ user: user._id }).sort({ date: -1 }).select('title amount');
+
+  const recentIncomeTitle = mostRecentIncome.title;
+const recentIncomeAmount = mostRecentIncome.amount;
+
+// Extracting title and amount from most recent expense
+const recentExpenseTitle = mostRecentExpense.title;
+const recentExpenseAmount = mostRecentExpense.amount;
+
+
 
   res.render('transactions.hbs', {
     user,
@@ -262,6 +274,10 @@ console.log("Date Range:", sevenDaysAgo, "to", currentDate);
     totalIncome,
     totalExpense,
     totalBalance,
+    recentIncomeTitle,
+    recentIncomeAmount,
+    recentExpenseTitle,
+    recentExpenseAmount,
     expenseData:JSON.stringify(expenseData)
   });
 

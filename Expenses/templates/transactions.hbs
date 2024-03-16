@@ -32,11 +32,11 @@
                 <canvas id="myChart" width="400" height="200"></canvas>
             </div>
             <div class="summary">
-                <div class="summary-item">
+                <div class="summary-item" >
                     <h2>Total Income</h2>  
                     <h2>{{totalIncome}}</h2>                  
                 </div>
-                <div class="summary-item">
+                <div class="summary-item" >
                     <h2>Total Expenses</h2>
                     <h2>{{totalExpense}}</h2>
                 </div>
@@ -48,7 +48,9 @@
             
             <div class="transactions">
                 <h2>Recent Transactions</h2>
-                <!-- Add transactions list here -->
+                 <h2>RECENT INCOME:   TITLE:{{recentIncomeTitle}}   AMOUNT:{{recentIncomeAmount}}</h2>
+                  <h2>RECENT INCOME:   TITLE:{{recentExpenseTitle}}   AMOUNT:{{recentExpenseAmount}}</h2>
+
             </div>
         </div>
     </div>
@@ -83,6 +85,12 @@
       }
     }
   });
+  let income=document.getElementById('income')
+  let expense=document.getElementById('expense')
+  let balance=document.getElementById('balance')
+  
+
+
 </script>
 </body>
 </html>
