@@ -291,6 +291,13 @@ const recentExpenseAmount = mostRecentExpense.amount;
   
 
 })
+//calculator
+app.get('/calculator',async (req,res)=>{
+  res.render('calculator.hbs')
+})
+app.get('/emicalculator',async (req,res)=>{
+  res.render('emicalculator.hbs')
+})
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
     // res.redirect('/login');

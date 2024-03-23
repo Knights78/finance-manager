@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMI Calculator</title>
+    <link rel="stylesheet" href="../public/emicalculator.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Calculator Menu</h2>
+            <ul>
+                <li><a href="/calculator">SIP Calculator</a></li>
+                <li><a href="/emicalculator">EMI Calculator</a></li>
+                <!-- Add links for other calculators if needed -->
+            </ul>
+        </div>
+
+        <div class="content">
+            <div class="calculator" id="emiCalculator">
+                <h1>EMI Calculator</h1>
+                <div class="input-group">
+                    <label for="loanAmount">Loan Amount:</label>
+                    <input type="range" id="loanAmount" name="loanAmount" min="10000" max="1000000" step="10000" value="100000">
+                    <span id="loanAmountValue">₹100,000</span>
+                </div>
+                <div class="input-group">
+                    <label for="timeTenure">Time Tenure (months):</label>
+                    <input type="range" id="timeTenure" name="timeTenure" min="6" max="120" step="6" value="12">
+                    <span id="timeTenureValue">12 months</span>
+                </div>
+                <div class="input-group">
+                    <label for="interestRate">Interest Rate (% p.a.):</label>
+                    <input type="range" id="interestRate" name="interestRate" min="4" max="20" step="0.1" value="8">
+                    <span id="interestRateValue">8%</span>
+                </div>
+                <button id="calculateButton">Calculate EMI</button>
+                <div class="result" id="resultSection" style="display: none;">
+                    <h2>EMI Calculation:</h2>
+                    <p id="emiAmount">EMI Amount: ₹<span id="emiValue">0</span></p>
+                    <p id="totalPayment">Total Payment: ₹<span id="totalPaymentValue">0</span></p>
+                    <p id="totalInterest">Total Interest: ₹<span id="totalInterestValue">0</span></p>
+                </div>
+                <div>
+                    <canvas id="emiPieChart" width="400" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../public/emicalculator.js"></script>
+</body>
+</html>

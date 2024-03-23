@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="../public/calculator.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Calculator Menu</h2>
+            <ul>
+                <li><a href="/calculator">SIP Calculator</a></li>
+                <li><a href="/emicalculator">EMI Calculator</a></li>
+                <li><a href="#otherCalculator">Other Calculator</a></li>
+                <li><a href="#setGoals">Set Goals</a></li>
+                <li><a href="#stockMarket">Stock Market</a></li>
+            </ul>
+        </div>
+
+        <div class="content">
+            <div class="calculator" id="sipCalculator">
+                <h1>SIP Calculator</h1>
+                <div class="input-group">
+                    <label for="monthlyInvestment">Monthly Investment:</label>
+                    <input type="range" id="monthlyInvestment" name="monthlyInvestment" min="500" max="100000" step="500" value="10000">
+                    <span id="monthlyInvestmentValue">₹10,000</span>
+                </div>
+                <div class="input-group">
+                    <label for="returnRate">Expected Return Rate (% p.a.):</label>
+                    <input type="range" id="returnRate" name="returnRate" min="2" max="18" step="0.1" value="10">
+                    <span id="returnRateValue">10%</span>
+                </div>
+                <div class="input-group">
+                    <label for="timePeriod">Time Period (years):</label>
+                    <input type="range" id="timePeriod" name="timePeriod" min="1" max="40" step="1" value="5">
+                    <span id="timePeriodValue">5 years</span>
+                </div>
+                <button id="calculateButton">Calculate SIP</button>
+                <div class="result" id="resultSection" style="display: none;">
+                    <h2>Results:</h2>
+                    <p id="totalInvestment">Total Investment: ₹<span id="investmentValue">0</span></p>
+                    <p id="totalReturns">Total Returns: ₹<span id="returnsValue">0</span></p>
+                </div>
+                <div>
+                    <canvas id="sipPieChart" width="400" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../public/calculator.js"></script>
+</body>
+</html>
