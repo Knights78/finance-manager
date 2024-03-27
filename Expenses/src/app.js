@@ -4,7 +4,7 @@ const hbs = require('hbs');
 const bodyParser = require('body-parser');
 const { connectMongoDB } = require('./mongo');
 // const User = require('./models/User');
-const { User, Income, Expense } = require('./models/User');
+const { User, Income, Expense,Goal } = require('./models/User');
 
 const path=require("path")
 const templatepath=path.join(__dirname,'../templates')
@@ -298,6 +298,38 @@ app.get('/calculator',async (req,res)=>{
 app.get('/emicalculator',async (req,res)=>{
   res.render('emicalculator.hbs')
 })
+//set goals section
+app.get('/setgoals', (req, res) => {
+  res.render('setgoals.hbs');
+});
+
+app.post('/setgoals', async (req, res) => {
+  const user = req.session.user; // Assuming the user is already in the session
+
+  // Extract data from the form submission
+  const { title, targetAmount, targetDate } = req.body;
+
+  try {
+    // Save the goal data to the database
+    const newGoal = new Goal({
+      user: user._id, // User has a unique identifier (_id)
+      title,
+      targetAmount,
+      targetDate,
+    });
+
+    const savedGoal = await newGoal.save();
+
+    console.log('Goal saved successfully:', savedGoal);
+    
+    // Redirect to a success page or render a success message
+    res.render('setgoals.hbs', { success: 'Goal saved successfully' });
+  } catch (error) {
+    // Handle errors appropriately
+    console.error(error);
+    res.render('setgoals.hbs', { error: 'Error saving goal' });
+  }
+});
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
     // res.redirect('/login');
