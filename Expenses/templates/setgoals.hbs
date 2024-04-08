@@ -41,6 +41,20 @@
                         <button type="submit">Set Goal</button>
                     </form>
                 </div>
+                <div id="feedback">
+                    <!-- Display feedback message -->
+                    {{#if feedback}}
+                        <p>{{ feedback }}</p>
+                    {{/if}}
+                    <!-- Display required saving amount -->
+                    <p>Required Saving Amount: ${{ requiredSavingAmount }}</p>
+                    <!-- Display suggested saving amount per week -->
+                    <p>Suggested Saving Amount per Week: ${{ suggestedSavingAmountPerWeek }}</p>
+                    <!-- Display suggested saving amount per month -->
+                    <p>Suggested Saving Amount per Month: ${{ suggestedSavingAmountPerMonth }}</p>
+                    <!-- Display available balance -->
+                    <p>Available Balance: ${{ availableBalance }}</p>
+                </div>
             </div>
         </div>
     </div>

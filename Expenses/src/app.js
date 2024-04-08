@@ -226,71 +226,67 @@ app.delete('/expense/:id',async(req,res)=>{
   }
 })
 //transactions section....///./...././
-app.get('/transactions',async (req,res)=>{
- 
-  try{  
-    let user=req.session.user;  
-  const existingIncome = await Income.find({ user: user._id });//all the dat for that particular id is there in exixiting income 
-  
-  const totalIncome = existingIncome.reduce((sum, income) => sum + income.amount, 0);//total income is actually the sum of all amounts in that particular id 
-  
-  
-  const existingExpense = await Expense.find({ user: user._id });
-  //console.log(existingIncome)
-  const totalExpense = existingExpense.reduce((sum, expense) => sum + expense.amount, 0);//expense: The current element in the array being processed.
-  const totalBalance=totalIncome-totalExpense
+app.get('/transactions', async (req, res) => {
+  try {
+    let user = req.session.user;
 
-  const currentDate = new Date();//this will give us the current date 
-  const sevenDaysAgo = new Date(currentDate);//this is taking the current date means initially sevendaysago and currentdate is same 
-  sevenDaysAgo.setDate(currentDate.getDate() - 6);//in this setdate method is used to setdate of sevendays ago currentdate.getdate will give us the date which is present in currentdate variable
-  console.log("User ID:", user._id);
-console.log("Date Range:", sevenDaysAgo, "to", currentDate);
-  const incomeRecords=await Income.find({user:user._id,date:{$gte:sevenDaysAgo,$lte:currentDate}});//in this we will get all the income which is satisfying the condition of date greater than sevendys and less than the current date
-  const incomeData=incomeRecords.map(record=>record.amount)//we are applying map for each record in that income collection and we are taking the amount menas at each index we are getting the income as an array 
+    const existingIncome = await Income.find({ user: user._id });
+    const totalIncome = existingIncome.reduce((sum, income) => sum + income.amount, 0);
 
-  //similarly for expenses as well 
-  const expenseRecords=await Expense.find({user:user._id,date:{$gte:sevenDaysAgo,$lte:currentDate}});//in this we will get all the income which is satisfying the condition of date greater than sevendys and less than the current date
-  //console.log(expenseRecords)
-  const expenseData=expenseRecords.map(record=>record.amount)
-  //console.log(expenseData)
-  //console.log(incomeData)
-  
-  const mostRecentIncome = await Income.findOne({ user: user._id }).sort({ date: -1 }).select('title amount');
+    const existingExpense = await Expense.find({ user: user._id });
+    const totalExpense = existingExpense.reduce((sum, expense) => sum + expense.amount, 0);
+    const totalBalance = totalIncome - totalExpense;
 
-  const mostRecentExpense = await Expense.findOne({ user: user._id }).sort({ date: -1 }).select('title amount');
+    const currentDate = new Date();
+    const sevenDaysAgo = new Date(currentDate);
+    sevenDaysAgo.setDate(currentDate.getDate() - 6);
 
-  const recentIncomeTitle = mostRecentIncome.title;
-const recentIncomeAmount = mostRecentIncome.amount;
+    //console.log("User ID:", user._id);
+    //console.log("Date Range:", sevenDaysAgo, "to", currentDate);
 
-// Extracting title and amount from most recent expense
-const recentExpenseTitle = mostRecentExpense.title;
-const recentExpenseAmount = mostRecentExpense.amount;
+    const incomeRecords = await Income.find({ user: user._id, date: { $gte: sevenDaysAgo, $lte: currentDate } });
+    const incomeData = incomeRecords.map(record => record.amount);
 
+    const expenseRecords = await Expense.find({ user: user._id, date: { $gte: sevenDaysAgo, $lte: currentDate } });
+    const expenseData = expenseRecords.map(record => record.amount);
 
+    let mostRecentIncome = await Income.findOne({ user: user._id }).sort({ date: -1 }).select('title amount');
+    let mostRecentExpense = await Expense.findOne({ user: user._id }).sort({ date: -1 }).select('title amount');
 
-  res.render('transactions.hbs', {
-    user,
-    incomeData:JSON.stringify(incomeData),
-    totalIncome,
-    totalExpense,
-    totalBalance,
-    recentIncomeTitle,
-    recentIncomeAmount,
-    recentExpenseTitle,
-    recentExpenseAmount,
-    expenseData:JSON.stringify(expenseData)
-  });
+    let recentIncomeTitle = "N/A";
+    let recentIncomeAmount = 0;
+    let recentExpenseTitle = "N/A";
+    let recentExpenseAmount = 0;
 
-  }
-  catch(error){
+    if (mostRecentIncome) {
+      recentIncomeTitle = mostRecentIncome.title;
+      recentIncomeAmount = mostRecentIncome.amount;
+    }
+
+    if (mostRecentExpense) {
+      recentExpenseTitle = mostRecentExpense.title;
+      recentExpenseAmount = mostRecentExpense.amount;
+    }
+
+    res.render('transactions.hbs', {
+      user,
+      incomeData: JSON.stringify(incomeData),
+      totalIncome,
+      totalExpense,
+      totalBalance,
+      recentIncomeTitle,
+      recentIncomeAmount,
+      recentExpenseTitle,
+      recentExpenseAmount,
+      expenseData: JSON.stringify(expenseData)
+    });
+
+  } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
-  
+});
 
-  
-
-})
 //calculator
 app.get('/calculator',async (req,res)=>{
   res.render('calculator.hbs')
@@ -303,33 +299,118 @@ app.get('/setgoals', (req, res) => {
   res.render('setgoals.hbs');
 });
 
+// Calculate Required Saving Amount
+async function calculateRequiredSavingAmount(userId, goalId) {
+  try {
+    const goal = await Goal.findOne({ user: userId, _id: goalId });
+    if (!goal) {
+      throw new Error('Goal not found');
+    }
+
+    // Fetch income and expense records for the past 7 days
+    const currentDate = new Date();
+    const sevenDaysAgo = new Date(currentDate);
+    sevenDaysAgo.setDate(currentDate.getDate() - 6);
+
+    const recentIncome = await Income.find({ user: userId, date: { $gte: sevenDaysAgo, $lte: currentDate } });
+    const recentExpense = await Expense.find({ user: userId, date: { $gte: sevenDaysAgo, $lte: currentDate } });
+
+    // Calculate total income and total expense for the past 7 days
+    const totalIncome = recentIncome.reduce((sum, income) => sum + income.amount, 0);
+    const totalExpense = recentExpense.reduce((sum, expense) => sum + expense.amount, 0);
+    console.log(totalIncome,totalExpense)
+
+    // Calculate initial saved amount based on total income and total expense
+    const initialSavedAmount = totalIncome - totalExpense;
+    console.log(initialSavedAmount)
+    // Calculate total amount needed to reach the goal
+    const totalAmountNeeded = goal.targetAmount - goal.savedAmount;
+
+    // Calculate time remaining until the target date
+    const remainingTime = Math.ceil((goal.targetDate - currentDate) / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
+
+    // Calculate the suggested saving amount per week or month
+    const suggestedSavingAmountPerWeek = totalAmountNeeded / (remainingTime / 7);
+    const suggestedSavingAmountPerMonth = totalAmountNeeded / (remainingTime / 30);
+
+    return {
+      totalAmountNeeded,
+      suggestedSavingAmountPerWeek: isNaN(suggestedSavingAmountPerWeek) ? 0 : suggestedSavingAmountPerWeek,
+      suggestedSavingAmountPerMonth: isNaN(suggestedSavingAmountPerMonth) ? 0 : suggestedSavingAmountPerMonth,
+      initialSavedAmount
+    };
+  } catch (error) {
+    console.error('Error calculating required saving amount:', error);
+    throw error;
+  }
+}
+
+// Provide Feedback
+function provideFeedback(savedAmount, totalAmountNeeded, suggestedSavingAmountPerWeek, suggestedSavingAmountPerMonth) {
+  if (savedAmount >= totalAmountNeeded) {
+    return 'Congratulations! You have reached your goal.';
+  } else if (savedAmount >= suggestedSavingAmountPerMonth) {
+    return 'You are making good progress. Keep it up!';
+  } else if (savedAmount >= suggestedSavingAmountPerWeek) {
+    return 'You are on track, but consider saving more to reach your goal on time.';
+  } else {
+    return 'You are falling behind. Try to increase your savings to stay on track.';
+  }
+}
+
+// Import the necessary functions for calculating required saving amount and providing feedback
+
 app.post('/setgoals', async (req, res) => {
   const user = req.session.user; // Assuming the user is already in the session
 
   // Extract data from the form submission
-  const { title, targetAmount, targetDate } = req.body;
+  const { title, targetAmount, targetDate, description } = req.body;
 
   try {
-    // Save the goal data to the database
+    // Fetch the user's total income and total expenses from the database
+    const userData = await User.findOne({ _id: user._id });
+    const totalIncome = userData.totalIncome;
+    const totalExpense = userData.totalExpense;
+
+    // Calculate the initial saved amount based on the user's total income and total expenses
+    const initialSavedAmount = totalIncome - totalExpense;
+     console.log(initialSavedAmount)
+    // Save the goal data to the database with the initial saved amount
     const newGoal = new Goal({
-      user: user._id, // User has a unique identifier (_id)
+      user: user._id,
       title,
       targetAmount,
       targetDate,
+      description,
+      savedAmount: initialSavedAmount
     });
 
     const savedGoal = await newGoal.save();
 
     console.log('Goal saved successfully:', savedGoal);
-    
-    // Redirect to a success page or render a success message
-    res.render('setgoals.hbs', { success: 'Goal saved successfully' });
+
+    // Calculate required saving amount
+    const { totalAmountNeeded, suggestedSavingAmountPerWeek, suggestedSavingAmountPerMonth } = await calculateRequiredSavingAmount(user._id, savedGoal._id);
+
+    // Provide feedback based on user's initial saved amount and the calculated required saving amount
+    const feedbackMessage = provideFeedback(initialSavedAmount, totalAmountNeeded, suggestedSavingAmountPerWeek, suggestedSavingAmountPerMonth);
+
+    // Render the set goals page again with the calculated required saving amount and feedback
+    res.render('setgoals.hbs', { 
+      success: 'Goal saved successfully',
+      requiredSavingAmount: totalAmountNeeded,
+      suggestedSavingAmountPerWeek,
+      suggestedSavingAmountPerMonth,
+      availableBalance: initialSavedAmount, // Pass the initial saved amount as available balance
+      feedback: feedbackMessage
+    });
   } catch (error) {
     // Handle errors appropriately
     console.error(error);
     res.render('setgoals.hbs', { error: 'Error saving goal' });
   }
 });
+
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
     // res.redirect('/login');
