@@ -1,0 +1,185 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    padding: 20px;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #f5fef4;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    margin-right: 20px;
+    margin-left: -10px;
+    margin-top: -12px
+}
+
+.sidebar ul {
+    list-style-type: none;
+}
+
+/* .sidebar a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: #333;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+} */
+
+.sidebar a{
+    color: black;
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    border-radius: 12px;
+    background-color: rgb(140, 162, 147);
+    width: 170px;
+    margin-top: 20px;
+}
+
+.sidebar a:hover {
+    background-color: #416545;
+    color: white;
+}
+
+.content {
+    flex: 1;
+    background-color: #f5fef4;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* padding: 20px; */
+    height: 100%;
+    margin: -12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 75%;
+}
+.calc{
+    color: white;
+    text-align: center;
+    /* padding: 2px; */
+    /* margin: 8px; */
+    /* margin-bottom: 20px; */
+    margin-top: 0px;
+    /* margin-left: 0px; */
+    height: 40px;
+    border-radius: 10px;
+    background-color: rgb(6, 38, 6);
+    padding-top: 6px;
+}
+.calculator {
+    width: 100%;
+    /* max-width: 600px; */
+    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+    padding: 10px;
+    margin: -9px;
+}
+.emic{
+    background-color: rgb(6, 38, 6);
+    padding: 6px;
+    padding-left: 9px;
+    margin: 10px;
+    margin-left: 0px;
+    color: white;
+    border-radius: 12px;
+}
+
+/* .calculator h1 {
+    text-align: left;
+    margin-bottom: 20px;
+} */
+
+.input-group {
+    margin-bottom: 20px;
+    
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.input-group input[type="range"] {
+    width: 100%;
+}
+
+.emicalc{
+    text-align: left;
+    background-color: rgb(6, 38, 6);
+    padding: 6px;
+    padding-left: 9px;
+    margin: 10px;
+    margin-left: 0px;
+    color: white;
+    border-radius: 12px;
+}
+
+
+.res{
+    text-align: left;
+    
+}
+
+#resultSection {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#emiPieChart {
+    margin: 0 auto;
+    max-width: 100%;
+    height: auto;
+}
+
+.result-container {
+    width: 100%;
+    max-width: 300px;
+    margin-left: auto;
+}
+
+#calculateButton{
+    background-color: rgb(6, 38, 6);
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    padding: 10px 20px;
+}
+
+#interestRateValue,
+#timeTenureValue,
+#loanAmountValue{
+    background-color: #e1f1d7;
+    border-radius: 5px;
+    display: inline-block;
+    padding: 5px 10px;
+}
+
+@media (max-width: 768px) {
+   .container {
+        flex-direction: column;
+    }
+
+   .sidebar {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+}

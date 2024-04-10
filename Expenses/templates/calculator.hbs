@@ -10,19 +10,19 @@
 <body>
     <div class="container">
         <div class="sidebar">
-            <h2>Calculator Menu</h2>
+            <h3>Calculator Menu</h3>
             <ul>
                 <li><a href="/calculator">SIP Calculator</a></li>
                 <li><a href="/emicalculator">EMI Calculator</a></li>
                 <li><a href="#otherCalculator">Other Calculator</a></li>
-                <li><a href="/setgoals">Set Goals</a></li>
+                <li><a href="#setGoals">Set Goals</a></li>
                 <li><a href="#stockMarket">Stock Market</a></li>
             </ul>
         </div>
 
         <div class="content">
             <div class="calculator" id="sipCalculator">
-                <h1>SIP Calculator</h1>
+                <h2>SIP Calculator</h2>
                 <div class="input-group">
                     <label for="monthlyInvestment">Monthly Investment:</label>
                     <input type="range" id="monthlyInvestment" name="monthlyInvestment" min="500" max="100000" step="500" value="10000">
@@ -40,7 +40,7 @@
                 </div>
                 <button id="calculateButton">Calculate SIP</button>
                 <div class="result" id="resultSection" style="display: none;">
-                    <h2>Results:</h2>
+                    <h2 class="result">Results:</h2>
                     <p id="totalInvestment">Total Investment: ₹<span id="investmentValue">0</span></p>
                     <p id="totalReturns">Total Returns: ₹<span id="returnsValue">0</span></p>
                 </div>

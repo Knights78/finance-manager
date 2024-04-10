@@ -110,7 +110,7 @@ app.get('/income', async (req, res) => {
   }
 
 
-  const existingIncome = await Income.find({ user: user._id });
+  const existingIncome = await Income.find({ user: user._id });//i will contain all things such as title amount date 
   //console.log(existingIncome)
   const totalIncome = existingIncome.reduce((sum, income) => sum + income.amount, 0);//this reduce is a method which is used in an iterable object here from the income sum is the variable initially it is zero and for new user the sum will be zero untile and unless it adds the income
   //console.log(totalIncome)
@@ -225,6 +225,7 @@ app.delete('/expense/:id',async(req,res)=>{
       res.status(500).json({ error: 'Error deleting expense entry' });
   }
 })
+const Chart = require('chart');
 //transactions section....///./...././
 app.get('/transactions', async (req, res) => {
   try {
@@ -267,7 +268,19 @@ app.get('/transactions', async (req, res) => {
       recentExpenseTitle = mostRecentExpense.title;
       recentExpenseAmount = mostRecentExpense.amount;
     }
+    const expenseTitles = existingExpense.map(expense => expense.title);
+     console.log(expenseTitles)
+        // Count occurrences of each title
+        const titleCounts = {};
+        expenseTitles.forEach(title => {
+            titleCounts[title] = (titleCounts[title] || 0) + 1;
+        });
 
+        // Prepare data for pie chart
+        const labels = Object.keys(titleCounts);
+        const data = Object.values(titleCounts);
+        console.log(labels,data)
+     
     res.render('transactions.hbs', {
       user,
       incomeData: JSON.stringify(incomeData),
@@ -278,7 +291,9 @@ app.get('/transactions', async (req, res) => {
       recentIncomeAmount,
       recentExpenseTitle,
       recentExpenseAmount,
-      expenseData: JSON.stringify(expenseData)
+      expenseData: JSON.stringify(expenseData),
+      pieChartLabels: JSON.stringify(labels),
+      pieChartData: JSON.stringify(data)
     });
 
   } catch (error) {

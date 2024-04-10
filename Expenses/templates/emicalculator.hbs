@@ -10,7 +10,7 @@
 <body>
     <div class="container">
         <div class="sidebar">
-            <h2>Calculator Menu</h2>
+            <h3 class="calc">Calculator Menu</h3>
             <ul>
                 <li><a href="/calculator">SIP Calculator</a></li>
                 <li><a href="/emicalculator">EMI Calculator</a></li>
@@ -20,7 +20,7 @@
 
         <div class="content">
             <div class="calculator" id="emiCalculator">
-                <h1>EMI Calculator</h1>
+                <h3 class="emic">EMI Calculator</h3>
                 <div class="input-group">
                     <label for="loanAmount">Loan Amount:</label>
                     <input type="range" id="loanAmount" name="loanAmount" min="10000" max="1000000" step="10000" value="100000">
@@ -38,10 +38,10 @@
                 </div>
                 <button id="calculateButton">Calculate EMI</button>
                 <div class="result" id="resultSection" style="display: none;">
-                    <h2>EMI Calculation:</h2>
-                    <p id="emiAmount">EMI Amount: ₹<span id="emiValue">0</span></p>
-                    <p id="totalPayment">Total Payment: ₹<span id="totalPaymentValue">0</span></p>
-                    <p id="totalInterest">Total Interest: ₹<span id="totalInterestValue">0</span></p>
+                    <h2 class="emicalc">EMI Calculation:</h2>
+                    <p class="res" id="emiAmount">EMI Amount: ₹<span id="emiValue">0</span></p>
+                    <p class="res" id="totalPayment">Total Payment: ₹<span id="totalPaymentValue">0</span></p>
+                    <p class="res" id="totalInterest">Total Interest: ₹<span id="totalInterestValue">0</span></p>
                 </div>
                 <div>
                     <canvas id="emiPieChart" width="400" height="400"></canvas>

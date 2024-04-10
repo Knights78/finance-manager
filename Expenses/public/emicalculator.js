@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 labels: ['EMI Amount', 'Total Payment', 'Total Interest'],
                 datasets: [{
                     data: [emi, totalPayment, totalInterest],
-                    backgroundColor: ['#36a2eb', '#ff6384', '#4bc0c0'],
+                    backgroundColor: ['#E6F69D', '#AADEA7', '#64C2A6'],
                 }]
             },
             options: {
