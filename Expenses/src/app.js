@@ -426,6 +426,10 @@ app.post('/setgoals', async (req, res) => {
   }
 });
 
+app.get('/TrueCostCalc',(req,res)=>{
+  res.render("TrueCostCalc.hbs")
+})
+
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
     // res.redirect('/login');
