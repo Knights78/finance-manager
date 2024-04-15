@@ -5,7 +5,9 @@ const bodyParser = require('body-parser');
 const { connectMongoDB } = require('./mongo');
 // const User = require('./models/User');
 const { User, Income, Expense,Goal } = require('./models/User');
-
+var request = require('request')
+var multer = require('multer');
+var upload = multer();
 const path=require("path")
 const templatepath=path.join(__dirname,'../templates')
 const app = express();
@@ -29,11 +31,12 @@ app.use(
 app.use(express.static('public'));
 app.use('/public', express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(bodyParser.json());
 app.use(express.json())
 app.set('view engine','hbs')//our view engine is hbs
 app.set("views",templatepath)
 app.use(express.urlencoded({extended:false}))
+app.use(upload.array());
 
 
 
@@ -426,8 +429,56 @@ app.post('/setgoals', async (req, res) => {
   }
 });
 
-app.get('/TrueCostCalc',(req,res)=>{
-  res.render("TrueCostCalc.hbs")
+app.get('/truecost',(req,res)=>{
+  res.render("truecost.hbs")
+})
+hbs.registerHelper('json', function(context) {
+  return JSON.stringify(context);
+});
+let mData = ""
+let coinName = "bitcoin"
+let mChart = ""
+
+   
+async function resData(coinName){
+  var marketData = await new Promise((resolve,reject)=>{
+      request('https://api.coingecko.com/api/v3/coins/' + coinName, function (error, response, body) {
+          if (error) {
+              console.error('Error:', error);
+              reject(error);
+          }
+          //console.log('Market Data:', body);
+          mData = JSON.parse(body);//whatever data is coming parse that it into jason format  
+          resolve(mData);
+      });
+  });//the above code to fecth the market data 
+
+  if(marketData){
+      var marketChart = await new Promise((resolve,reject)=>{
+          request('https://api.coingecko.com/api/v3/coins/' + coinName + '/market_chart?vs_currency=inr&days=30', function (error, response, body) {
+              if (error) {
+                  console.error('Error:', error);
+                  reject(error);
+              }
+              //console.log('Market Chart Data:', body);
+              mChart = JSON.parse(body);
+              resolve(mChart);
+          });
+      });
+  }//the above code to fetch the market chart 
+}
+
+
+
+app.get('/crypto', async(req, res) => {
+    await resData(coinName)
+    res.render('crypto', { mData,mChart,coinName })
+})
+
+app.post('/crypto', async (req, res) => {
+    coinName = req.body.selectCoin;
+    await resData(coinName)
+    res.render('crypto', { mData,mChart,coinName })
 })
 
 app.get('/logout', (req, res) => {
