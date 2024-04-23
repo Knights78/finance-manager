@@ -312,126 +312,7 @@ app.get('/calculator',async (req,res)=>{
 app.get('/emicalculator',async (req,res)=>{
   res.render('emicalculator.hbs')
 })
-//set goals section
-app.get('/setgoals', (req, res) => {
-  res.render('setgoals.hbs');
-});
 
-// Calculate Required Saving Amount
-async function calculateRequiredSavingAmount(userId, goalId) {
-  try {
-    const goal = await Goal.findOne({ user: userId, _id: goalId });
-    if (!goal) {
-      throw new Error('Goal not found');
-    }
-
-    // Fetch income and expense records for the past 7 days
-    const currentDate = new Date();
-    const sevenDaysAgo = new Date(currentDate);
-    sevenDaysAgo.setDate(currentDate.getDate() - 6);
-
-    const recentIncome = await Income.find({ user: userId, date: { $gte: sevenDaysAgo, $lte: currentDate } });
-    const recentExpense = await Expense.find({ user: userId, date: { $gte: sevenDaysAgo, $lte: currentDate } });
-
-    // Calculate total income and total expense for the past 7 days
-    const totalIncome = recentIncome.reduce((sum, income) => sum + income.amount, 0);
-    const totalExpense = recentExpense.reduce((sum, expense) => sum + expense.amount, 0);
-    console.log(totalIncome,totalExpense)
-
-    // Calculate initial saved amount based on total income and total expense
-    const initialSavedAmount = totalIncome - totalExpense;
-    console.log(initialSavedAmount)
-    // Calculate total amount needed to reach the goal
-    const totalAmountNeeded = goal.targetAmount - goal.savedAmount;
-
-    // Calculate time remaining until the target date
-    const remainingTime = Math.ceil((goal.targetDate - currentDate) / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
-
-    // Calculate the suggested saving amount per week or month
-    const suggestedSavingAmountPerWeek = totalAmountNeeded / (remainingTime / 7);
-    const suggestedSavingAmountPerMonth = totalAmountNeeded / (remainingTime / 30);
-
-    return {
-      totalAmountNeeded,
-      suggestedSavingAmountPerWeek: isNaN(suggestedSavingAmountPerWeek) ? 0 : suggestedSavingAmountPerWeek,
-      suggestedSavingAmountPerMonth: isNaN(suggestedSavingAmountPerMonth) ? 0 : suggestedSavingAmountPerMonth,
-      initialSavedAmount
-    };
-  } catch (error) {
-    console.error('Error calculating required saving amount:', error);
-    throw error;
-  }
-}
-
-// Provide Feedback
-function provideFeedback(savedAmount, totalAmountNeeded, suggestedSavingAmountPerWeek, suggestedSavingAmountPerMonth) {
-  if (savedAmount >= totalAmountNeeded) {
-    return 'Congratulations! You have reached your goal.';
-  } else if (savedAmount >= suggestedSavingAmountPerMonth) {
-    return 'You are making good progress. Keep it up!';
-  } else if (savedAmount >= suggestedSavingAmountPerWeek) {
-    return 'You are on track, but consider saving more to reach your goal on time.';
-  } else {
-    return 'You are falling behind. Try to increase your savings to stay on track.';
-  }
-}
-
-// Import the necessary functions for calculating required saving amount and providing feedback
-
-app.post('/setgoals', async (req, res) => {
-  const user = req.session.user; // Assuming the user is already in the session
-
-  // Extract data from the form submission
-  const { title, targetAmount, targetDate, description } = req.body;
-
-  try {
-    // Fetch the user's total income and total expenses from the database
-    const userData = await User.findOne({ _id: user._id });
-    const totalIncome = userData.totalIncome;
-    const totalExpense = userData.totalExpense;
-
-    // Calculate the initial saved amount based on the user's total income and total expenses
-    const initialSavedAmount = totalIncome - totalExpense;
-     console.log(initialSavedAmount)
-    // Save the goal data to the database with the initial saved amount
-    const newGoal = new Goal({
-      user: user._id,
-      title,
-      targetAmount,
-      targetDate,
-      description,
-      savedAmount: initialSavedAmount
-    });
-
-    const savedGoal = await newGoal.save();
-
-    console.log('Goal saved successfully:', savedGoal);
-
-    // Calculate required saving amount
-    const { totalAmountNeeded, suggestedSavingAmountPerWeek, suggestedSavingAmountPerMonth } = await calculateRequiredSavingAmount(user._id, savedGoal._id);
-
-    // Provide feedback based on user's initial saved amount and the calculated required saving amount
-    const feedbackMessage = provideFeedback(initialSavedAmount, totalAmountNeeded, suggestedSavingAmountPerWeek, suggestedSavingAmountPerMonth);
-
-    // Render the set goals page again with the calculated required saving amount and feedback
-    res.render('setgoals.hbs', { 
-      success: 'Goal saved successfully',
-      requiredSavingAmount: totalAmountNeeded,
-      suggestedSavingAmountPerWeek,
-      suggestedSavingAmountPerMonth,
-      availableBalance: initialSavedAmount, // Pass the initial saved amount as available balance
-      feedback: feedbackMessage
-    });
-  } catch (error) {
-    // Handle errors appropriately
-    console.error(error);
-    res.render('setgoals.hbs', { error: 'Error saving goal' });
-  }
-});
-
-app.get('/truecost',(req,res)=>{
-  res.render("truecost.hbs")
-})
 hbs.registerHelper('json', function(context) {
   return JSON.stringify(context);
 });
@@ -480,6 +361,90 @@ app.post('/crypto', async (req, res) => {
     await resData(coinName)
     res.render('crypto', { mData,mChart,coinName })
 })
+//set goals section
+app.get('/setgoals',async(req,res)=>{
+  res.render('setgoals.hbs')
+})
+app.post('/setgoals',async(req,res)=>{
+  const user=req.session.user
+  let{goalName,goalAmount,startDate,endDate,description}=req.body
+  try {
+    const newGoal = new Goal({
+      name: goalName,
+      amount: goalAmount,
+      description: description,
+      startDate: startDate,
+      endDate: endDate
+  });
+  const savedGoal = await newGoal.save();
+  //res.status(201).json({ message: 'Goal added successfully', goal: savedGoal });
+  res.render('setgoals.hbs')
+
+
+  } catch (error) {
+    console.log(error,"error saving the goal")
+  }
+})
+app.get('/api/goals', async (req, res) => {
+  try {
+      // Retrieve all goals from the database
+      const goals = await Goal.find();
+
+      // Send the goals data as a response
+      res.status(200).json(goals);
+  } catch (error) {
+      // Handle errors
+      console.error('Error fetching goals:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+app.get('/api/goals/:id', async (req, res) => {
+  const goalId = req.params.id;
+  //console.log(goalId)
+  try {
+      // Retrieve the goal from the database based on the ID
+      const goal = await Goal.findById(goalId);
+
+      if (!goal) {
+          // If the goal is not found, return a 404 error
+          return res.status(404).json({ error: 'Goal not found' });
+      }
+
+      // If the goal is found, return it as a JSON response
+      res.status(200).json(goal);
+  } catch (error) {
+      // If an error occurs, return a 500 error
+      console.error('Error fetching goal:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+app.post('/api/goals/deposit', async (req, res) => {
+  try {
+    const { goalId, depositAmount } = req.body;
+    //console.log(goalId)
+
+    // Find the goal by ID
+    const goal = await Goal.findById(goalId);
+    //console.log(goal)
+
+    if (!goal) {
+        return res.status(404).json({ error: 'Goal not found' });
+    }
+
+    // Update the current amount of the goal by adding the deposit amount
+    goal.currentAmount += parseFloat(depositAmount);
+    
+    // Save the updated goal to the database
+    await goal.save();
+
+    // Respond with a success message
+    res.status(200).json({ message: 'Deposit saved successfully', goal: goal });
+} catch (error) {
+    console.error('Error saving deposit:', error);
+    res.status(500).json({ error: 'Internal server error' });
+}
+});
+
 
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {

@@ -11,7 +11,6 @@ const userSchema = new Schema({
           required:true
       }
 
-  // Add more fields as needed (e.g., name, expenses, income)
 });
 
 const User = mongoose.model('users', userSchema);
@@ -56,31 +55,48 @@ const ExpenseSchema = new Schema({
   // Other transaction-specific fields
 });
 
-const GoalSchema = new Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+const goalSchema = new Schema({
+  name: {
+      type: String,
+      required: true
   },
-  title: {
-    type: String,
-    required: true,
+  amount: {
+      type: Number,
+      required: true
   },
-  targetAmount: {
-    type: Number,
-    required: true,
+  description: {
+      type: String
   },
-  targetDate: {
-    type: Date,
-    required: true,
+  startDate: {
+      type: Date,
+      required: true
   },
-  description: String
-  // Other goal-specific fields
+  endDate: {
+      type: Date,
+      required: true
+  },
+  currentAmount: {
+      type: Number,
+      default: 0
+  },
+  deposits: [{
+      amount: {
+          type: Number,
+          required: true
+      },
+      date: {
+          type: Date,
+          default: Date.now
+      }
+  }]
 });
+
+//module.exports = mongoose.model('Goal', goalSchema);
 const Income = mongoose.model('incomes', IncomeSchema);
 const Expense = mongoose.model('expenses', ExpenseSchema);
 
 
-const Goal = mongoose.model('goals', GoalSchema); // New model for goals
+const Goal = mongoose.model('goals', goalSchema); // New model for goals
 
 module.exports = { User, Income, Expense, Goal };
 

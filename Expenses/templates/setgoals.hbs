@@ -1,62 +1,164 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Set Goals</title>
-    <link rel="stylesheet" type="text/css" href="../public/setgoals.css">
+    <link rel="stylesheet" href="..\public\setgoals.css">
 </head>
 <body>
-    <div id="container">
-        <nav>
-            <div id="profile">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWkSWLRxX42sG_oDs7OlqF2x2Vs88aEBqyWA&usqp=CAU" alt="">
-                <p>{{user.username}}</p>
+    <div class="container">
+        <h1>Add New Goal</h1>
+        <form id="goalForm" action="/setgoals" method="post">
+            <div class="form-group">
+                <label for="goalName">Goal Name:</label>
+                <input type="text" id="goalName" name="goalName" required>
             </div>
-            <ul>
-                <li><a href="/dashboard">Dashboard</a></li>
-                <li><a href="#">View Transactions</a></li>
-                <li><a href="/income">Incomes</a></li>
-                <li><a href="/expenses">Expenses</a></li>
-                <li><a href="/calculator">Calculator</a></li>
-                <li><a href="/emicalculator">EMI Calculator</a></li>
-                <div id="logoutbtn"><button id="logout">Log out</button></div>
-            </ul>
-        </nav>
-        <div id="content">
-            <h2 id="heading">Set Financial Goals</h2>
-            <div id="inputfield">
-                <div id="forms">
-                    <form action="/setgoals" method="post">
-                        <label for="title">Title:</label>
-                        <input class="field" type="text" id="title" name="title" required>
-
-                        <label for="targetAmount">Target Amount:</label>
-                        <input class="field" type="number" id="targetAmount" name="targetAmount" required>
-
-                        <label for="targetDate">Target Date:</label>
-                        <input class="field" type="date" id="targetDate" name="targetDate" required>
-
-                        <label for="description">Description:</label>
-                        <textarea class="field" id="description" name="description"></textarea>
-
-                        <button type="submit">Set Goal</button>
-                    </form>
-                </div>
-                <div id="feedback">
-                    <!-- Display feedback message -->
-                    {{#if feedback}}
-                        <p>{{ feedback }}</p>
-                    {{/if}}
-                    <!-- Display required saving amount -->
-                    <p>Required Saving Amount: ${{ requiredSavingAmount }}</p>
-                    <!-- Display suggested saving amount per week -->
-                    <p>Suggested Saving Amount per Week: ${{ suggestedSavingAmountPerWeek }}</p>
-                    <!-- Display suggested saving amount per month -->
-                    <p>Suggested Saving Amount per Month: ${{ suggestedSavingAmountPerMonth }}</p>
-                    <!-- Display available balance -->
-                    <p>Available Balance: ${{ availableBalance }}</p>
-                </div>
+            <div class="form-group">
+                <label for="goalAmount">Goal Amount:</label>
+                <input type="number" id="goalAmount" name="goalAmount" required>
             </div>
-        </div>
+            <div class="form-group">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" name="startDate" required>
+            </div>
+            <div class="form-group">
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" name="endDate" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea id="description" name="description"></textarea>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        <div id="goalsContainer"></div>
     </div>
+    </div>
+
+    <script>
+        // Function to fetch all goals from the database and display them
+async function fetchAndDisplayGoals() {
+    try {
+        // Fetch all goals from the database
+        const response = await fetch('/api/goals');
+        const goals = await response.json();
+
+        // Display each goal
+        goals.forEach(goal => {
+            displayGoal(goal);
+        });
+    } catch (error) {
+        console.error('Error fetching goals:', error);
+    }
+}
+
+// Function to display goal div
+function displayGoal(goal) {
+    const goalsContainer = document.getElementById('goalsContainer');
+    const goalDiv = document.createElement('div');
+    goalDiv.classList.add('goal');
+    goalDiv.id=`goal-${goal._id}`
+    goalDiv.innerHTML = `
+        <h2>${goal.name}</h2>
+        <p>Target Amount: ${goal.amount}</p>
+        <p class="current-amount">Current Amount: ${goal.currentAmount}</p>
+        <!-- Progress bar -->
+        <div class="progress">
+            <!-- Progress bar value -->
+            <div class="progress-bar" style="width: ${calculateProgress(goal)}%"></div>
+        </div>
+    `;
+    //console.log(goal._id)
+     goalDiv.addEventListener('click', () => {
+        openDepositWindow(goal._id,goal);
+    });
+    goalsContainer.appendChild(goalDiv);
+}
+
+// Function to calculate progress towards the goal
+function calculateProgress(goal) {
+    return (goal.currentAmount / goal.amount) * 100;
+}
+function openDepositWindow(id,goal) {
+        // Create a modal overlay
+        const overlay = document.createElement('div');
+        overlay.classList.add('overlay');
+        
+        // Create a modal dialog
+        const modal = document.createElement('div');
+        modal.classList.add('modal');
+        modal.innerHTML = `
+            <h2>${goal.name}</h2>
+            <p>Target Amount: ${goal.amount}</p>
+            <p>Current Amount: ${goal.currentAmount}</p>
+            <form id="depositForm" action="/spi/goals/deposit" method="post">
+                <label for="depositAmount">Deposit Amount:</label>
+                <input type="number" id="depositAmount" name="depositAmount" required>
+                <button type="submit">Submit</button>
+                <button type="button" id="closeModal">Close</button>
+            </form>
+        `;
+        
+        // Append modal to overlay
+        overlay.appendChild(modal);
+        
+        // Append overlay to document body
+        document.body.appendChild(overlay);
+        
+        // Handle form submission in the modal dialog
+        const depositForm = modal.querySelector('#depositForm');
+        depositForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const depositAmount = depositForm.querySelector('#depositAmount').value;
+            try {
+                // Send deposit amount to the server
+                const response = await fetch('/api/goals/deposit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        goalId: id, // Pass goal ID to identify the goal
+                        depositAmount: depositAmount
+                    })
+                });
+                if (response.ok) {
+                    // Handle successful response
+                    // Close the modal
+                    const updatedGoalResponse = await fetch(`/api/goals/${id}`);
+                    const updatedGoal = await updatedGoalResponse.json();
+                   console.log(updatedGoal._id)
+                    updateGoalDOM(updatedGoal);
+                    document.body.removeChild(overlay);
+                } else {
+                    // Handle error response
+                    console.error('Error storing deposit:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error storing deposit:', error.message);
+            }
+        });
+
+        // Handle close button click
+        const closeModalButton = modal.querySelector('#closeModal');
+        closeModalButton.addEventListener('click', () => {
+            // Remove the modal
+            document.body.removeChild(overlay);
+        });
+    }
+    function updateGoalDOM(updatedGoal) {
+    const goalDiv = document.getElementById(`goal-${updatedGoal._id}`);
+   console.log(goalDiv)
+    if (goalDiv) {
+        goalDiv.querySelector('.current-amount').textContent = `Current Amount: ${updatedGoal.currentAmount}`;
+        const progressBar = goalDiv.querySelector('.progress-bar');
+        progressBar.style.width = `${calculateProgress(updatedGoal)}%`;
+    }
+}
+// Fetch and display goals when the page loads
+window.onload = fetchAndDisplayGoals;
+
+    </script>
 </body>
 </html>
